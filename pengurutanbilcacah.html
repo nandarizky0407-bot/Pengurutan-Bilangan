@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelajaran Matematika: Bilangan Ribuan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Poppins:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ==========================================================================
+           1. DASAR FRAMEWORK & NAVIGASI
+           ========================================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { background-color: #e2e8f0; color: #1e293b; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 20px; overflow-y: auto; }
+        .presentation-container { position: relative; width: 1280px; height: 720px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1); border: 1px solid rgba(0, 0, 0, 0.05); max-width: 100%; margin-bottom: 20px; }
+        @media screen and (max-height: 800px) { .presentation-container { transform: scale(0.9); transform-origin: top center; } }
+        @media screen and (max-height: 700px) { .presentation-container { transform: scale(0.8); transform-origin: top center; } }
+
+        .slide-deck { width: 100%; height: 100%; position: relative; }
+        .slide-node { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; padding: 60px 80px 100px 80px; display: flex; flex-direction: column; justify-content: flex-start; z-index: 1; overflow-y: auto; background: radial-gradient(circle at 90% 10%, #dcfd8b33 0%, transparent 40%), radial-gradient(circle at 10% 90%, #bc84ee33 0%, transparent 40%); }
+        .slide-node.active-slide { opacity: 1; visibility: visible; z-index: 2; }
+
+        /* ==========================================================================
+           2. TIPOGRAFI
+           ========================================================================== */
+        h1, h2, h3, h4 { font-family: 'Comfortaa', cursive; font-weight: 700; color: #0f172a; }
+        .slide-header-title { font-size: 38px; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 3px dashed #bc84ee; width: 100%; }
+        p, li { font-size: 20px; line-height: 1.6; color: #475569; }
+
+        /* ==========================================================================
+           3. KOMPONEN INTERAKTIF
+           ========================================================================== */
+        .core-btn { padding: 12px 28px; font-family: 'Comfortaa', cursive; font-weight: 700; font-size: 16px; border: none; border-radius: 15px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-purple { background: #bc84ee; color: white; }
+        .btn-orange { background: #ff823a; color: white; }
+        .btn-green { background: #dcfd8b; color: #1e293b; }
+        .btn-purple:hover, .btn-orange:hover, .btn-green:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .btn-wayground { background: #4f46e5; color: white; padding: 18px 40px; font-size: 20px; border-radius: 20px; }
+
+        .math-input { border: 2px solid #cbd5e1; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 22px; padding: 10px; outline: none; text-align: center; transition: 0.3s; }
+        .input-correct { border-color: #22c55e !important; background: #f0fdf4 !important; color: #166534; }
+        .input-wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b; }
+
+        /* AREA KERJA KHUSUS LAYOUT */
+        .big-number-display { font-size: 68px; font-weight: 700; color: #ff823a; background: #fff; padding: 10px 40px; border-radius: 25px; border: 4px solid #fdd5bd; margin-bottom: 30px; text-align: center; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .pv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+        .pv-box { background: white; padding: 20px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; }
+        
+        .comp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; align-self: center; max-width: 1000px; }
+        .comp-row { background: white; border: 2px solid #f1f5f9; border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-evenly; font-family: 'JetBrains Mono'; font-weight: bold; font-size: 22px; }
+
+        .sort-container { display: flex; justify-content: center; gap: 15px; width: 100%; margin-top: 30px; }
+        .sort-card { background: white; border: 2px solid #e2e8f0; border-radius: 25px; padding: 25px 15px; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .sort-number { font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 700; color: #4f46e5; }
+        
+        .timer-badge { font-family: 'JetBrains Mono'; font-size: 28px; background: #0f172a; color: #dcfd8b; padding: 10px 25px; border-radius: 15px; margin-bottom: 15px; display: inline-block; }
+        .discussion-panel { display: none; margin-top: 15px; padding: 15px; background: #fffbeb; border-left: 5px solid #f59e0b; border-radius: 4px; font-size: 18px; color: #92400e; }
+
+        .nav-bar { position: absolute; bottom: 0; width: 100%; height: 75px; background: white; border-top: 2px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 100; }
+        .nav-btn { background: #f1f5f9; border: 1px solid #cbd5e1; width: 45px; height: 45px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .progress-line { position: absolute; bottom: 73px; left: 0; width: 100%; height: 6px; background: #f1f5f9; z-index: 101; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #bc84ee, #ff823a); transition: width 0.3s ease; width: 4.76%; }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        <div class="progress-line"><div class="progress-fill" id="progressBar"></div></div>
+
+        <div class="slide-deck" id="mainDeck">
+            <div class="slide-node active-slide" id="s1">
+                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <div style="background:#bc84ee; height:8px; width:100px; margin-bottom:20px; border-radius:4px;"></div>
+                    <h1 class="cover-title">Mengurutkan Bilangan<br><span style="color:#bc84ee;">Hingga Ribuan</span></h1>
+                    <p style="font-size: 26px; color:#64748b;">Ayo Belajar Membandingkan dan Mengurutkan Angka dengan Seru!</p>
+                    <div style="margin-top:40px; font-size:80px; color:#ff823a;"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s2">
+                <h2 class="slide-header-title">Tujuan Pembelajaran</h2>
+                <div style="flex-grow:1; display:flex; align-items:center; justify-content:center;">
+                    <div style="background:#fdf4ff; border-left:10px solid #bc84ee; padding:50px; border-radius:30px; max-width:900px;">
+                        <p style="font-size:26px; font-weight: 500;">Hari ini kita akan belajar menjadi ahli matematika yang teliti! Kamu akan mampu <strong>mengurutkan berbagai bilangan cacah ribuan</strong> dari yang terkecil ke terbesar, maupun sebaliknya.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s3">
+                <h2 class="slide-header-title">Pemanasan 1: Nilai Tempat</h2>
+                <div style="text-align:center; width:100%;">
+                    <div class="big-number-display" id="pvDisplay">----</div>
+                    <div class="pv-grid">
+                        <div class="pv-box"><h3>Ribuan</h3><input type="number" id="pvIn0" class="math-input" style="width:100%" oninput="validateLivePV(0)"></div>
+                        <div class="pv-box"><h3>Ratusan</h3><input type="number" id="pvIn1" class="math-input" style="width:100%" oninput="validateLivePV(1)"></div>
+                        <div class="pv-box"><h3>Puluhan</h3><input type="number" id="pvIn2" class="math-input" style="width:100%" oninput="validateLivePV(2)"></div>
+                        <div class="pv-box"><h3>Satuan</h3><input type="number" id="pvIn3" class="math-input" style="width:100%" oninput="validateLivePV(3)"></div>
+                    </div>
+                    <div style="margin-top:30px; display:flex; justify-content:center; gap:15px;">
+                        <button class="core-btn btn-purple" onclick="checkPlaceValue()">Cek Jawaban</button>
+                        <button class="core-btn btn-orange" id="pvNextBtn" onclick="nextPV()" disabled>Ganti Bilangan</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s4">
+                <h2 class="slide-header-title">Pemanasan 2: Membandingkan (&gt;, &lt;, =)</h2>
+                <div class="comp-grid" id="compGrid"></div>
+                <div style="text-align:center; margin-top:20px;">
+                    <button class="core-btn btn-green" onclick="checkComparison()">Cek Semua Jawaban</button>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s5">
+                <h2 class="slide-header-title">Cara Mengurutkan Bilangan</h2>
+                <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:center; flex-grow:1;">
+                    <div style="background:#eff6ff; padding:35px; border-radius:30px; border-left:8px solid #3b82f6;">
+                        <p style="font-weight:700; margin-bottom:15px; color:#1e3a8a;">Ikuti urutan pemeriksaan ini:</p>
+                        <ul style="list-style:none; line-height:2.2;">
+                            <li><span style="color:#3b82f6; font-weight:bold;">1.</span> Bandingkan angka <b>Ribuan</b> paling depan.</li>
+                            <li><span style="color:#3b82f6; font-weight:bold;">2.</span> Jika sama, lihat angka <b>Ratusan</b>.</li>
+                            <li><span style="color:#3b82f6; font-weight:bold;">3.</span> Jika masih sama, lihat <b>Puluhan</b>.</li>
+                            <li><span style="color:#3b82f6; font-weight:bold;">4.</span> Terakhir, lihat <b>Satuan</b> paling belakang.</li>
+                        </ul>
+                    </div>
+                    <div style="text-align:center; background:#f8fafc; padding:30px; border-radius:30px; border:2px dashed #bc84ee;">
+                        <h3 style="color:#bc84ee;">Contoh:</h3>
+                        <p style="font-size:22px;"><b>4250</b> dan <b>4270</b></p>
+                        <p style="font-size:18px;">Ribuan (4=4), Ratusan (2=2)</p>
+                        <p style="font-size:24px; color:#ff823a; font-weight:bold;">Puluhan (5 &lt; 7)</p>
+                        <p style="font-weight:700;">4250 &lt; 4270</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s6">
+                <h2 class="slide-header-title">Urutkan: Terkecil &rarr; Terbesar</h2>
+                <p>Beri nomor urut 1 sampai 5 pada kotak di bawah angka!</p>
+                <div id="ascBox" class="sort-container"></div>
+                <div id="ascBanner" style="margin-top:20px; font-weight:bold; color:#22c55e; font-size:24px; text-align:center; height:35px;"></div>
+                <div style="text-align:center; margin-top:10px;">
+                    <button class="core-btn btn-purple" onclick="checkOrdering('asc')">Cek Urutan</button>
+                    <button class="core-btn btn-orange" onclick="refreshSort('asc')">Ganti Soal</button>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s7">
+                <h2 class="slide-header-title">Urutkan: Terbesar &rarr; Terkecil</h2>
+                <p>Beri nomor urut 1 (paling besar) sampai 5 (paling kecil)!</p>
+                <div id="descBox" class="sort-container"></div>
+                <div id="descBanner" style="margin-top:20px; font-weight:bold; color:#22c55e; font-size:24px; text-align:center; height:35px;"></div>
+                <div style="text-align:center; margin-top:10px;">
+                    <button class="core-btn btn-orange" onclick="checkOrdering('desc')">Cek Urutan</button>
+                    <button class="core-btn btn-purple" onclick="refreshSort('desc')">Ganti Soal</button>
+                </div>
+            </div>
+
+            <div id="storyContainer"></div>
+
+            <div class="slide-node" id="s18">
+                <h2 class="slide-header-title">Laporan Kecepatan Berpikirmu</h2>
+                <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:40px; flex-grow:1;">
+                    <div id="analyticsList" style="background:#f8fafc; padding:20px; border-radius:25px; overflow-y:auto; max-height:400px; border:2px solid #f1f5f9;"></div>
+                    <div style="background:#0f172a; color:white; padding:40px; border-radius:30px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                        <h3 style="color:white;">Rata-rata Waktu</h3>
+                        <h1 id="avgTimeLabel" style="font-size:68px; color:#dcfd8b; margin:20px 0; font-family:'JetBrains Mono'">-- s</h1>
+                        <div style="height:3px; width:60%; background:#334155; margin-bottom:20px;"></div>
+                        <p id="perfPhrase" style="font-size:24px; font-weight:bold;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s19">
+                <h2 class="slide-header-title">Kesimpulan & Refleksi</h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; flex-grow:1; align-items:center;">
+                    <div class="pv-box" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                        <h3 style="color:#bc84ee;"><i class="fa-solid fa-brain"></i> Apa Intinya?</h3>
+                        <p>Mengurutkan bilangan ribuan harus dilakukan secara sistematis dari depan ke belakang. Teliti melihat satu demi satu angka sangatlah penting!</p>
+                    </div>
+                    <div class="pv-box" style="height:100%; display:flex; flex-direction:column; justify-content:center; border-color:#dcfd8b;">
+                        <h3 style="color:#84cc16;"><i class="fa-solid fa-lightbulb"></i> Refleksi</h3>
+                        <p>Bagian mana yang paling menantang? Membandingkan angka ratusan yang mirip atau mengurutkan dari yang terbesar?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s20">
+                <h2 class="slide-header-title">Pelajaran Berikutnya</h2>
+                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <h1 style="font-size:52px; margin-bottom:30px;">Penjumlahan & Pengurangan</h1>
+                    <p style="margin-bottom:40px; color:#64748b; font-size:24px;">Siapkan pensilmu untuk teknik menyimpan dan meminjam!</p>
+                    
+                    <a href="https://wayground.com/admin/quiz/6a376586a4a28aa87a43d2f0" target="_blank" class="core-btn btn-wayground">
+                        <i class="fa-solid fa-gamepad"></i> Mainkan Kuis di Wayground
+                    </a>
+                    
+                    <div style="font-size:70px; color:#bc84ee; margin-top:40px;"><i class="fa-solid fa-calculator"></i></div>
+                </div>
+            </div>
+
+            <div class="slide-node" id="s21">
+                <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <h1 style="font-size:80px; color:#10b981;">Hebat!<br>Terima Kasih</h1>
+                    <p style="font-size:24px; margin-top:20px; color:#64748b;">Sampai jumpa di petualangan angka selanjutnya!</p>
+                    <p style="margin-top:60px; opacity:0.3; font-size:14px;">Math Interactive App v1.0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <div style="display:flex; gap:12px;">
+                <button class="nav-btn" onclick="navSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="nav-btn" onclick="navSlide(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="slide-counter" id="slideCounter" style="font-weight:bold; color:#64748b;">Slide 1 / 21</div>
+        </div>
+    </div>
+
+    <script>
+        let currentIdx = 1;
+        const totalSlides = 21;
+        let storySolveTimes = new Array(10).fill(0);
+        let activeTimer = null;
+        let tStart = 0;
+
+        function navSlide(dir) {
+            const next = currentIdx + dir;
+            if (next < 1 || next > totalSlides) return;
+            document.getElementById(`s${currentIdx}`).classList.remove('active-slide');
+            document.getElementById(`s${next}`).classList.add('active-slide');
+            currentIdx = next;
+            document.getElementById('slideCounter').innerText = `Slide ${currentIdx} / ${totalSlides}`;
+            document.getElementById('progressBar').style.width = `${(currentIdx/totalSlides)*100}%`;
+            
+            if (currentIdx >= 8 && currentIdx <= 17) resetStoryTimer(currentIdx);
+            else clearInterval(activeTimer);
+        }
+
+        function speak(txt) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'en-US';
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        /* --- LOGIKA LIVE COLOR SLIDE 3 --- */
+        const pvNumbers = ["2450", "1025", "8899", "3341", "9001", "7628", "5544", "1234", "6789", "4500"];
+        let pvPtr = 0;
+
+        function loadPV() {
+            document.getElementById('pvDisplay').innerText = pvNumbers[pvPtr];
+            for(let i=0; i<4; i++) {
+                const el = document.getElementById(`pvIn${i}`);
+                el.value = ''; el.className = 'math-input';
+            }
+            document.getElementById('pvNextBtn').disabled = true;
+        }
+
+        function validateLivePV(idx) {
+            const el = document.getElementById(`pvIn${idx}`);
+            const target = pvNumbers[pvPtr][idx];
+            
+            // Jika kosong, kembalikan ke warna normal
+            if (el.value === "") {
+                el.className = 'math-input';
+                return;
+            }
+            
+            // Jika siswa mengetik ulang dan jawabannya berubah jadi benar, ubah ke hijau live
+            if (el.value === target) {
+                el.className = 'math-input input-correct';
+            } else {
+                el.className = 'math-input input-wrong';
+            }
+        }
+
+        function checkPlaceValue() {
+            const target = pvNumbers[pvPtr];
+            let allCorrect = true;
+            for(let i=0; i<4; i++) {
+                const el = document.getElementById(`pvIn${i}`);
+                if(el.value === target[i]) {
+                    el.className = 'math-input input-correct';
+                } else {
+                    el.className = 'math-input input-wrong';
+                    allCorrect = false;
+                }
+            }
+            if(allCorrect) { 
+                speak("Nice"); 
+                document.getElementById('pvNextBtn').disabled = false; 
+            } else {
+                speak("Try again");
+            }
+        }
+        function nextPV() { pvPtr = (pvPtr + 1) % 10; loadPV(); }
+
+        /* --- SLIDE 4: MEMBANDINGKAN --- */
+        const compData = [[1250, 1520], [4000, 3999], [8870, 8870], [1020, 1002], [5540, 5550], [9999, 9999], [2451, 2451], [7800, 7799], [6120, 6210], [3300, 3300]];
+        function initComparison() {
+            const grid = document.getElementById('compGrid');
+            compData.forEach((d, i) => {
+                grid.innerHTML += `<div class="comp-row"><span class="comp-val">${d[0]}</span><input type="text" id="ci${i}" class="math-input" style="width:60px"><span>${d[1]}</span></div>`;
+            });
+        }
+        function checkComparison() {
+            let win = true;
+            compData.forEach((d, i) => {
+                const el = document.getElementById(`ci${i}`);
+                const ans = d[0] > d[1] ? '>' : (d[0] < d[1] ? '<' : '=');
+                if(el.value.trim() === ans) el.className = 'math-input input-correct';
+                else { el.className = 'math-input input-wrong'; win = false; }
+            });
+            speak(win ? "Nice" : "Try again");
+        }
+
+        /* --- SLIDE 6 & 7: DATA ACAK & SOAL BERBEDA --- */
+        const sortSets = {
+            asc: [ [1100, 1250, 2900, 4321, 5000], [2130, 2310, 3120, 3210, 4001], [1000, 1002, 1020, 2001, 2010], [5234, 5324, 5342, 5423, 5432], [9009, 9099, 9909, 9990, 9999] ],
+            desc: [ [9500, 8200, 5100, 4600, 1200], [4444, 4441, 4440, 4404, 4044], [3500, 3050, 3005, 2500, 2050], [7890, 7809, 7089, 6999, 6099], [8888, 8880, 8808, 8088, 8008] ]
+        };
+        let sPtr = { asc: 0, desc: 0 };
+
+        function renderSort(type) {
+            const container = document.getElementById(`${type}Box`);
+            container.innerHTML = '';
+            const rawSet = sortSets[type][sPtr[type]];
+            
+            // Proses pengacakan (Fisher-Yates Shuffle) agar tampilan acak total
+            const shuffledSet = [...rawSet].sort(() => Math.random() - 0.5);
+            
+            shuffledSet.forEach((num, i) => {
+                container.innerHTML += `
+                <div class="sort-card">
+                    <span class="sort-number">${num}</span>
+                    <input type="number" id="${type}i${i}" data-val="${num}" class="math-input" style="width:70px" placeholder="0">
+                </div>`;
+            });
+        }
+
+        function checkOrdering(type) {
+            const container = document.getElementById(`${type}Box`);
+            const inputs = container.querySelectorAll('input');
+            const targetSet = [...sortSets[type][sPtr[type]]];
+            
+            // Kalkulasi urutan kunci jawaban asli
+            const sorted = [...targetSet].sort((a,b) => type === 'asc' ? a-b : b-a);
+            let win = true;
+
+            inputs.forEach(inp => {
+                const val = parseInt(inp.getAttribute('data-val'));
+                const rank = sorted.indexOf(val) + 1;
+                
+                if(parseInt(inp.value) === rank) {
+                    inp.className = 'math-input input-correct';
+                } else {
+                    inp.className = 'math-input input-wrong';
+                    win = false;
+                }
+            });
+
+            if(win) { 
+                speak("Nice"); 
+                document.getElementById(`${type}Banner`).innerText = "Hebat! Urutan Benar!"; 
+            } else {
+                speak("Try again");
+            }
+        }
+        function refreshSort(type) { sPtr[type] = (sPtr[type] + 1) % 5; document.getElementById(`${type}Banner`).innerText = ""; renderSort(type); }
+
+        /* --- SLIDE 8-17: BANK SOAL CERITA --- */
+        const storyBank = [
+            {q: "Andi punya 1250 kelereng, Budi 1100, Caca 1400. Siapa yang kelerengnya paling sedikit?", a: "budi", p: "Bandingkan ratusannya: 100 < 250 < 400. Maka Budi (1100) terkecil."},
+            {q: "Gunung A 2450m, Gunung B 2455m, Gunung C 2440m. Sebutkan Gunung yang tertinggi?", a: "b", p: "Satuan 5 > 0, jadi 2455 (B) paling tinggi."},
+            {q: "Ibu melihat harga beras: 8500, 8250, dan 8750. Berapa angka nominal harga termurah?", a: "8250", p: "Ratusan 2 lebih kecil dari 5 dan 7."},
+            {q: "Populasi desa X adalah 1050, desa Y adalah 1005. Desa mana yang lebih banyak?", a: "x", p: "1050 > 1005."},
+            {q: "Urutkan: 8900, 8090, 8009. Bilangan mana yang nilainya paling kecil?", a: "8009", p: "Ratusan 0 dan puluhan 0 adalah yang terkecil."},
+            {q: "Hasil panen jagung 2150 kg, kedelai 2510 kg. Mana yang lebih berat?", a: "kedelai", p: "Ratusan 5 > 1."},
+            {q: "Tinggi badan: 1205mm, 1250mm, 1200mm. Berapa angka yang paling tinggi?", a: "1250", p: "Puluhan 5 > 0."},
+            {q: "Lengkapi deret: 1100, 1200, ..., 1400. Berapa angka di tengahnya?", a: "1300", p: "Pola lompat 100."},
+            {q: "Berapakah digit RATUSAN pada bilangan 7821?", a: "8", p: "7=Ribuan, 8=Ratusan, 2=Puluhan, 1=Satuan."},
+            {q: "Mana yang benar: '4500 > 5400' atau '4500 < 5400'?", a: "4500 < 5400", p: "4 Ribu < 5 Ribu."}
+        ];
+        function initStories() {
+            const container = document.getElementById('storyContainer');
+            storyBank.forEach((s, i) => {
+                const id = i + 8;
+                container.innerHTML += `
+                <div class="slide-node" id="s${id}">
+                    <h2 class="slide-header-title">Soal Cerita #${i+1}</h2>
+                    <div style="background:white; border:2px solid #e2e8f0; padding:35px; border-radius:30px; width:100%;">
+                        <div class="timer-badge" id="t${id}">00:00</div>
+                        <p style="margin-bottom:20px; font-weight:700;">${s.q}</p>
+                        <div style="display:flex; gap:15px; margin-bottom:15px;">
+                            <input type="text" id="ans${id}" class="math-input" style="flex:1; text-align:left;" placeholder="Jawaban kamu...">
+                            <button class="core-btn btn-green" onclick="checkStory(${id}, '${s.a}')">Cek</button>
+                            <button class="core-btn btn-orange" id="btnSt${id}" onclick="startStoryTimer(${id})">Start</button>
+                        </div>
+                        <button class="core-btn btn-purple" style="opacity:0.7" onclick="toggleDisc(${id})">Pembahasan</button>
+                        <div class="discussion-panel" id="p${id}">${s.p}</div>
+                    </div>
+                </div>`;
+            });
+        }
+        function startStoryTimer(id) {
+            clearInterval(activeTimer);
+            tStart = Date.now();
+            activeTimer = setInterval(() => {
+                const diff = Math.floor((Date.now() - tStart)/1000);
+                const m = Math.floor(diff/60).toString().padStart(2,'0');
+                const s = (diff%60).toString().padStart(2,'0');
+                document.getElementById(`t${id}`).innerText = `${m}:${s}`;
+            }, 1000);
+            document.getElementById(`btnSt${id}`).disabled = true;
+        }
+        function resetStoryTimer(id) { clearInterval(activeTimer); document.getElementById(`t${id}`).innerText = "00:00"; document.getElementById(`btnSt${id}`).disabled = false; }
+        function toggleDisc(id) { const p = document.getElementById(`p${id}`); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+        
+        function checkStory(id, correct) {
+            const inp = document.getElementById(`ans${id}`);
+            const val = inp.value.toLowerCase().trim().replace(/[^a-z0-9<>=]/g, '');
+            const target = correct.toLowerCase().replace(/[^a-z0-9<>=]/g, '');
+            if(val.includes(target) || target.includes(val)) {
+                clearInterval(activeTimer);
+                inp.className = 'math-input input-correct';
+                const timeStr = document.getElementById(`t${id}`).innerText;
+                const [m, s] = timeStr.split(':').map(Number);
+                storySolveTimes[id-8] = (m * 60) + s;
+                updateStats(); speak("Nice");
+            } else { inp.className = 'math-input input-wrong'; speak("Try again"); }
+        }
+
+        function updateStats() {
+            const list = document.getElementById('analyticsList');
+            list.innerHTML = '';
+            let totalT = 0, count = 0;
+            storySolveTimes.forEach((t, i) => {
+                if(t > 0) {
+                    totalT += t; count++;
+                    list.innerHTML += `<div style="background:white; border:1px solid #e2e8f0; padding:12px; border-radius:15px; margin-bottom:8px; display:flex; justify-content:space-between;"><span>Soal #${i+1}</span><b style="color:#bc84ee;">${t} s</b></div>`;
+                }
+            });
+            if(count > 0) {
+                const avg = Math.round(totalT / count);
+                document.getElementById('avgTimeLabel').innerText = `${avg} s`;
+                const ph = document.getElementById('perfPhrase');
+                if(avg < 60) { ph.innerText = "EXCELLENT! Kamu secepat kilat!"; ph.style.color = "#10b981"; }
+                else if(avg <= 240) { ph.innerText = "GOOD JOB! Kamu sudah hebat!"; ph.style.color = "#bc84ee"; }
+                else { ph.innerText = "KEREN! Ayo berlatih lagi agar makin cepat!"; ph.style.color = "#ff823a"; }
+            }
+        }
+
+        // Jalankan inisialisasi framework saat sistem siap
+        window.onload = () => { loadPV(); initComparison(); renderSort('asc'); renderSort('desc'); initStories(); };
+    </script>
+</body>
+</html>
